@@ -1,6 +1,6 @@
 FROM node:18
-RUN mkdir -p /OpenAPI-QOS/node_modules && chown -R node:node /OpenAPI-QOS
-WORKDIR /OpenAPI-QOS
+RUN mkdir -p /OpenAPI-SQM/node_modules && chown -R node:node /OpenAPI-SQM
+WORKDIR /OpenAPI-SQM
 COPY package.json .
 USER node
 RUN npm install

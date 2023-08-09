@@ -1,4 +1,4 @@
-# OpenAPI QOS - Schema Quality Control for OpenAPI Services
+# OpenAPI SQM - Schema Quality Monitor for OpenAPI Services
 
 This is a service application that helps you keep track of the quality of incoming data payloads based on your OpenAPI specifications.
 
@@ -19,11 +19,11 @@ This solution uses Node.js and MongoDB for storage and queue service.
 Run in this directory to build and run the app:
 
 ```shell
-cd compose
+cd openapisqm-compose
 docker compose up
 ``` 
 
-The `OpenAPI QOS` service will be running at [http://localhost:6868](http://localhost:6868), and the API documentation will be at [http://localhost:6868/docs/documentation.html](http://localhost:6868/docs/documentation.html).
+The `OpenAPI SQM` service will be running at [http://localhost:6868](http://localhost:6868), and the API documentation will be at [http://localhost:6868/docs/documentation.html](http://localhost:6868/docs/documentation.html).
 
 ## Examples
 
@@ -74,7 +74,7 @@ This service has not undergone a security hardening, so we suggest that you:
  - Enable individual identification of sensitive fields that should never be persisted - Redact
  - Performance - automate load test.
  - Performance - evaluate the use of Redis for queue management.
- - Performance - prioritized workers by apis/schemas. 
+ - Performance - specialize workers by apis/schemas (less memory). 
  - Create parameter to limit when a compiled schema (ajv) can be freed after a while.
  - Enable the check of header schemas.
  - syncronous option (?)
@@ -84,10 +84,10 @@ This service has not undergone a security hardening, so we suggest that you:
 
 ![Architecture diagram](architecture.png)
 
-* A service developed in [Node.js](/ApiQualityControl-app) and specified in [OpenAPI](/ApiQualityControl-app/public)
+* An asynchronows service developed in [Node.js](/processes/master.js) and specified with [OpenAPI](/public/openapi.json)
 * A [MongoDB](https://hub.docker.com/_/MongoDB/) database to act as a queue 
 * A [MongoDB](https://hub.docker.com/_/MongoDB/) to store results
-* A [Node.js](/worker/) worker which consumes payloads received and evaluate them…
+* A [Node.js](/processes/worker.js) worker which consumes payloads received and evaluate them…
 
 ## Thanks
 

@@ -1,5 +1,5 @@
 {
-  "name": "openapiqos",
+  "name": "openapisqm",
   "version": "0.0.2",
   "description": "Asynchronously check payloads for adherence to schemas defined in an OpenAPI specification",
   "main": "app.js",

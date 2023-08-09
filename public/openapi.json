@@ -1,7 +1,7 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "OpenAPI QOS - Schema Quality Control for OpenAPI Services",
+    "title": "OpenAPI SQM - Schema Quality Monitor for OpenAPI Services",
     "description": "Asynchronously check payloads for adherence to schemas defined in an OpenAPI specification.",
     "contact": {
       "email": "gustavo.gerhardt@gmail.com"
