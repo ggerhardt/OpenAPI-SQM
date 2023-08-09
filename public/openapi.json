@@ -1,0 +1,1118 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "OpenAPI QOS - Schema Quality Control for OpenAPI Services",
+    "description": "Asynchronously check payloads for adherence to schemas defined in an OpenAPI specification.",
+    "contact": {
+      "email": "gustavo.gerhardt@gmail.com"
+    },
+    "license": {
+      "name": "Open Database License (ODbL)",
+      "url": "http://opendefinition.org/licenses/odc-odbl/"
+    },
+    "version": "0.0.2"
+  },
+  "security": [
+    {
+      "APIKeyAuth": []
+    }
+  ],
+  "servers": [
+    {
+      "url": "http://localhost:6868/api",
+      "description": "Docker compose instance [6868]"
+    },
+    {
+      "url": "http://localhost:8080/api",
+      "description": "Debug instance [8080]"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Payloads checks",
+      "description": "Manage payloads sent for checking"
+    },
+    {
+      "name": "Reports",
+      "description": "Manage reports execution and results"
+    }    
+  ],
+  "paths": {
+    "/payloads": {
+      "get": {
+        "tags": [
+          "Payloads checks"
+        ],
+        "summary": "List payloads",
+        "description": "Lists all payloads sent for checking and their status",
+        "operationId": "getPayloads",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filters records by processing status.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "example": "STARTED",
+              "default": "FINISHED",
+              "enum": [
+                "NOT_STARTED",
+                "STARTED",
+                "FINISHED",
+                "ERROR",
+                "ERROR_SCHEMA"
+              ]
+            }
+          },
+          {
+            "name": "payload_source_id",
+            "in": "query",
+            "description": "Filters records by payload_source_id",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "example": "11.222.333"
+            }
+          },
+          {
+            "name": "interaction_id",
+            "in": "query",
+            "description": "Filters records by interaction_id.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "example": "09be02f2-0a3f-11ee-be56-0242ac120002"
+            }
+          },
+          {
+            "name": "tags",
+            "in": "query",
+            "description": "Filter records by tags, separated by a comma (','). Only records with all requested tags will be listed.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "example": "dados abertos"
+            },
+            "example": "dados abertos, pix"
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "description": "Filters records by date, according to RFC-3339 specification, UTC format. If not filled in, the default is to filter by the current date.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "[0-9]{4}-[0-9]{2}-[0-9]{2}",
+              "example": "2021-02-01"
+            }
+          },
+          {
+            "name": "detailed_info",
+            "in": "query",
+            "description": "Defines whether detailed information on returned errors should be returned.",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "example": "TRUE",
+              "default": "FALSE",
+              "enum": [
+                "TRUE",
+                "FALSE"
+              ]
+            }
+          },
+          {
+            "name": "page_number",
+            "in": "query",
+            "description": "Page number to be returned.",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "example": 1,
+              "default": 1,
+              "minimum": 1,
+              "maximum": 10000
+            }
+          },
+          {
+            "name": "records_per_page",
+            "in": "query",
+            "description": "Number of records to return per request.",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "example": 50,
+              "default": 50,
+              "minimum": 1,
+              "maximum": 10000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/payload_list"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error_400"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Payloads checks"
+        ],
+        "summary": "Add payload",
+        "description": "Add new payload to be checked against its OpenAPI schema",
+        "operationId": "addPayload",
+        "requestBody": {
+          "description": "Payload",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/payload_add"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/payload"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error_400"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Payloads checks"
+        ],
+        "summary": "Delete payloads",
+        "description": "Delete payloads checks from the database",
+        "operationId": "deletePayloads",
+        "parameters": [
+          {
+            "name": "tag",
+            "in": "query",
+            "description": "Tag identifying the payloads to be deleted.",
+            "required": true,
+            "schema": {
+              "maxLength": 256,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error_400"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payloads/{payload_id}": {
+      "get": {
+        "tags": [
+          "Payloads checks"
+        ],
+        "summary": "Get payload",
+        "description": "Get information related to a payload check",
+        "operationId": "getPayload",
+        "parameters": [
+          {
+            "name": "payload_id",
+            "in": "path",
+            "description": "payload_id is the payload's unique identifier.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "maxLength": 256,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/payload"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error_400"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Payloads checks"
+        ],
+        "summary": "Delete payload",
+        "description": "Delete a payload check from the database",
+        "operationId": "deletePayload",
+        "parameters": [
+          {
+            "name": "payload_id",
+            "in": "path",
+            "description": "payload_id is the payload's unique identifier.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "maxLength": 256,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error_400"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reports": {
+      "get": {
+        "parameters": [
+          {
+            "name": "aggregator_field",
+            "in": "query",
+            "description": "Filters reports that used this field as aggregator",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "payloadSourceId",
+                "oasUrl"
+              ],
+              "example": "payloadSourceId"
+            }
+          },
+          {
+            "name": "aggregator_field_value",
+            "in": "query",
+            "description": "Filters reports aggregated by this value",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "example": "11.222.333"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "description": "Filters records by period, according to RFC-3339 specification, UTC format. If not filled in, the default is to filter by the current date.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "([0-9]{4}-[0-9]{2}-[0-9]{2})?[:]?([0-9]{4}-[0-9]{2}-[0-9]{2})?",
+              "example": "2021-12-29:2021-12-31"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filters records by processing status.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "example": "STARTED",
+              "default": "FINISHED",
+              "enum": [
+                "NOT_STARTED",
+                "STARTED",
+                "FINISHED",
+                "ERROR"
+              ]
+            }
+          },
+          {
+            "name": "page_number",
+            "in": "query",
+            "description": "Page number to be returned.",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "example": 1,
+              "default": 1,
+              "minimum": 1,
+              "maximum": 10000
+            }
+          },
+          {
+            "name": "records_per_page",
+            "in": "query",
+            "description": "Number of records to return per request.",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "example": 50,
+              "default": 50,
+              "minimum": 1,
+              "maximum": 10000
+            }
+          }
+        ],
+        "summary": "Get reports",
+        "tags": [
+          "Reports"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/report_list"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error_400"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "getReports",
+        "description": "Lists all generated reports"
+      },
+      "post": {
+        "summary": "Create reports",
+        "tags": [
+          "Reports"
+        ],
+        "requestBody": {
+          "description": "Report payload",
+          "content": {
+            "application/json": {
+              "schema": {
+                "description": "Report payload",
+                "type": "object",
+                "required": ["createReportsBy", "createDailyReports"],
+                "properties": {
+                  "createReportsBy": {
+                    "description": "Defines by which field the individual reports will be created. If 'oasUrl' is selected, a report will be generated by 'oasUrl' aggregating the results of all evaluated loads that meet the filters.",
+                    "enum": [
+                      "payloadSourceId",
+                      "oasUrl"
+                    ],
+                    "type": "string",
+                    "example": "payloadSourceId"
+                  },
+                  "createDailyReports": {
+                    "description": "Defines whether the reports will be generated for a period of days or if they will be generated by day",
+                    "type": "boolean",
+                    "example": true
+                  },                  
+                  "filters": {
+                    "type": "object",
+                    "properties": {
+                      "payloadSourceId": {
+                        "description": "Filter payloads by payloadSourceId",
+                        "type": "string",
+                        "example": "11.222.333"
+                      },
+                      "oasUrl": {
+                        "description": "Filter payloads by OpenAPI Specification",
+                        "type": "string",
+                        "format": "uri",
+                        "example": "https://openbanking-brasil.github.io/openapi/swagger-apis/customers/2.0.1.yml"
+                      },
+                      "startDate": {
+                        "description": "Select the initial date to generate reports. If not filled, a report will be generated per day available for each payloadSourceId.",
+                        "type": "string",
+                        "format": "date",
+                        "pattern": "[0-9]{4}-[0-9]{2}-[0-9]{2}",
+                        "example": "2021-02-01"
+                      },
+                      "endDate": {
+                        "description": "Select a date to generate reports. If not filled, a report will be generated per day available for each payloadSourceId.",
+                        "type": "string",
+                        "format": "date",
+                        "pattern": "[0-9]{4}-[0-9]{2}-[0-9]{2}",
+                        "example": "2021-02-01"
+                      }                      
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/report_list"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error_400"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "addReports",
+        "description": "Create new reports"
+      }
+    },
+    "/reports/{report_id}": {
+      "get": {
+        "parameters": [
+          {
+            "name": "report_id",
+            "in": "path",
+            "description": "report_id is the unique identifier of the request.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "maxLength": 256,
+              "type": "string"
+            }
+          }
+        ],
+        "summary": "Get report",
+        "tags": [
+          "Reports"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/report"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error_400"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "getReport",
+        "description": "Get a report"
+      },
+      "delete": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Delete report",
+        "description": "Delete a report from the database",
+        "operationId": "deleteReport",
+        "parameters": [
+          {
+            "name": "report_id",
+            "in": "path",
+            "description": "report_id is the unique identifier of the request.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "maxLength": 256,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error_400"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "error_400": {
+        "type": "object",
+        "properties": {
+          "err": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "payload_add": {
+        "description": "Payload structure being added",
+        "type": "object",
+        "required": [
+          "oasUrl",
+          "payloadSourceId",
+          "responsePayload",
+          "requestOperation",
+          "responseCode",
+          "date"
+        ],
+        "properties": {
+          "oasUrl": {
+            "description": "Url of the OpenAPI Specification file",
+            "type": "string",
+            "format": "uri",
+            "example": "https://openbanking-brasil.github.io/openapi/swagger-apis/customers/2.0.1.yml"
+          },
+          "payloadSourceId": {
+            "description": "Identify the origin/destination of the payload. This attribute can be used to filter payloads added and as report aggregator.",
+            "type": "string",
+            "example": "11.222.333"
+          },
+          "payloadSourceName": {
+            "description": "Text name identifying the origin/destination of the payload.",
+            "type": "string",
+            "example": "Bank xyz"
+          },
+          "interactionId": {
+            "type": "string",
+            "example": "09be02f2-0a3f-11ee-be56-0242ac120002"
+          },
+          "requestUrl": {
+            "type": "string",
+            "example": "https://api.banco.com.br/open-banking/customers/v2/personal/identifications",
+            "description": "Uri that generated the 'responsePayload'. The 'requestPath', if not provided, will be inferred from it."
+          },
+          "requestPath": {
+            "type": "string",
+            "example": "/personal/identifications",
+            "description": "Endpoint within de API Specification that generated the payload. If not provided, the 'requestUrl' should be."
+          },
+          "requestOperation": {
+            "type": "string",
+            "example": "GET",
+            "description": "Operation that generated the payload."
+          },
+          "requestContentType": {
+            "type": "string",
+            "description": "Type of information to be returned. Default is 'application/json'.",
+            "example": "application/json"
+          },
+          "responseCode": {
+            "type": "string",
+            "example": "200"
+          },
+          "responsePayload": {
+            "type": "object",
+            "description": "Payload that will be checked against the OpenAPI schema definition"
+          },
+          "responsePayloadEncripted": {
+            "type": "string",
+            "description": "Encrypted payload",
+            "minLength": 1
+          },
+          "tags": {
+            "type": "string",
+            "example": "interactionId:a342d532d2343"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "pattern": "[0-9]{4}-[0-9]{2}-[0-9]{2}",
+            "example": "2021-02-01"
+          }
+        }
+      },
+      "payload": {
+        "description": "Payload structure",
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "oasUrl": {
+            "type": "string",
+            "format": "uri",
+            "example": "https://openbanking-brasil.github.io/openapi/swagger-apis/customers/2.0.1.yml"
+          },
+          "payloadSourceId": {
+            "description": "Identify the origin/destination of the payload. This attribute can be used to filter payloads added and as report aggregator.",
+            "type": "string",
+            "example": "11.222.333"
+          },
+          "payloadSourceName": {
+            "description": "Text name identifying the origin/destination of the payload.",
+            "type": "string",
+            "example": "Bank xyz"
+          },
+          "interactionId": {
+            "type": "string",
+            "example": "09be02f2-0a3f-11ee-be56-0242ac120002"
+          },
+          "requestUrl": {
+            "type": "string",
+            "example": "https://api.banco.com.br/open-banking/customers/v2/personal/identifications"
+          },
+          "requestPath": {
+            "type": "string",
+            "example": "/personal/identifications"
+          },
+          "requestOperation": {
+            "type": "string",
+            "example": "GET"
+          },
+          "requestContentType": {
+            "type": "string",
+            "description": "Indicates the type of information to be returned. Default is 'application/json'.",
+            "example": "application/json"
+          },
+          "responseCode": {
+            "type": "string",
+            "example": "200"
+          },
+          "responsePayload": {
+            "type": "object",
+            "description": "Payload that will be checked against the OpenAPI schema definition"
+          },
+          "responsePayloadEncripted": {
+            "type": "string",
+            "description": "Encrypted payload",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "example": "STARTED",
+            "default": "FINISHED",
+            "enum": [
+              "NOT_STARTED",
+              "STARTED",
+              "FINISHED",
+              "ERROR",
+              "ERROR_SCHEMA"
+            ]
+          },
+          "statusDetail": {
+            "type": "string",
+            "example": "STARTED",
+            "description": "When 'status'='ERROR', field describes the error."
+          },
+          "tags": {
+            "type": "string",
+            "example": "interactionId:a342d532d2343"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "pattern": "[0-9]{4}-[0-9]{2}-[0-9]{2}",
+            "example": "2021-02-01"
+          },
+          "testDate": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2021-02-01T19:10:22.549Z"
+          },
+          "oasInfo": {
+            "description": "Main attributes from the specification used in the reports.",
+            "type": "object",
+            "properties": {
+              "schemaId": {
+                "type": "string",
+                "example": "https://openbanking-brasil.github.io/openapi/swagger-apis/customers/2.0.1.yml_/personal/identifications_get_default_application/json; charset=utf-8"
+              },
+              "oasApiName": {
+                "type": "string",
+                "example": "API Customers - Open Finance Brasil 2.0.1"
+              },
+              "oasPath": {
+                "type": "string",
+                "example": "/personal/identifications"
+              },
+              "oasOperation": {
+                "type": "string",
+                "example": "GET"
+              },
+              "oasResponseCode": {
+                "type": "string",
+                "example": "200"
+              },
+              "oasContentType": {
+                "type": "string",
+                "example": "application/json"
+              }
+            }
+          },
+          "log": {
+            "type": "array",
+            "uniqueItems": true,
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "properties": {
+                "genInstancePath": {
+                  "type": "string",
+                  "example": "/data/[]/updateDateTime",
+                  "description": "Attribute's generic path"
+                },
+                "message": {
+                  "type": "string",
+                  "minLength": 1,
+                  "example": "should follow the pattern \"^(\\d{4})-(1[0-2]|0?[1-9])-(3[01]|[12][0-9]|0?[1-9])T(?:[01]\\d|2[0123]):(?:[012345]\\d):(?:[012345]\\d)Z$\"",
+                  "description": "Error description"
+                },
+                "count": {
+                  "type": "integer",
+                  "description": "Number of times the error was found",
+                  "example": 1
+                },
+                "instancePathExample": {
+                  "type": "string",
+                  "example": "/data/3/updateDateTime",
+                  "description": "Path of one attribute with the problem."
+                },
+                "instanceValueExample": {
+                  "type": "string",
+                  "example": "7941-12-01T22:20:31.0Z",
+                  "description": "Attribute value with the problem. If listed as 'sensitive', the value may be blank or masked."
+                },
+                "keyword": {
+                  "type": "string",
+                  "minLength": 1,
+                  "example": "format",
+                  "description": "Error type classification."
+                },
+                "allInstances": {
+                  "type": "array",
+                  "minLength": 1,
+                  "description": "Lists all misbehaving paths of this type. The service may be configured to not save all paths.",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "instancePath": {
+                        "type": "string",
+                        "minLength": 1,
+                        "example": "/data/3/updateDateTime",
+                        "description": "Path of the attribute."
+                      },
+                      "instanceValue": {
+                        "type": "string",
+                        "minLength": 1,
+                        "example": "7941-12-01T22:20:31.0Z",
+                        "description": "Attribute value with the problem. If listed as 'sensitive', the value may be blank or masked."
+                      }
+                    }
+                  }
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          }
+        }
+      },
+      "payload_list": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/payload"
+        }
+      },
+      "report": {
+        "description": "Report structure",
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "example": "STARTED",
+            "default": "FINISHED",
+            "enum": [
+              "NOT_STARTED",
+              "STARTED",
+              "FINISHED",
+              "ERROR"
+            ]
+          },
+          "statusDetail": {
+            "type": "string",
+            "example": "STARTED",
+            "description": "Conditional. Exists only when 'status'='ERROR'. It describes the error found"
+          },
+          "createdDateTime": {
+            "description": "DateTime when the report was created",
+            "type": "string",
+            "format": "date-time",
+            "example": "2021-02-01T19: 10: 22.549Z"
+          },
+          "groupedByField": {
+            "description": "Report aggregator field",
+            "type": "string",
+            "example": "payloadSourceId"
+          },
+          "groupedByValue": {
+            "description": "Report aggregator field value",
+            "type": "string",
+            "example": "11.222.333"
+          },
+          "period": {
+            "description": "Describes the period to which the report refers to. Can be an interval or a single date",
+            "type": "string",
+            "example": "2021-02-01:2021-02-10"
+          },
+          "consolidatedList": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/endpoint_agg_info"
+            }
+          }
+        }
+      },
+      "endpoint_agg_info": {
+        "type": "object",
+        "properties": {
+          "oasUrl": {
+            "type": "string",
+            "format": "uri",
+            "example": "https://openbanking-brasil.github.io/openapi/swagger-apis/customers/2.0.1.yml"
+          },
+          "requestPath": {
+            "type": "string",
+            "example": "/personal/identifications"
+          },
+          "requestOperation": {
+            "type": "string",
+            "example": "GET"
+          },
+          "responseCode": {
+            "type": "string",
+            "example": "200"
+          },
+          "responseContentType": {
+            "type": "string",
+            "example": "application/json"
+          },
+          "finishedOk": {
+            "type": "integer",
+            "example": 223
+          },
+          "finishedErrorSchema": {
+            "type": "integer",
+            "example": 4
+          },
+          "finishedErrorOther": {
+            "type": "integer",
+            "example": 1
+          },
+          "notStarted": {
+            "type": "integer",
+            "example": 0
+          },
+          "running": {
+            "type": "integer",
+            "example": 0
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/errorLog"
+            }
+          }
+        }
+      },
+      "errorLog": {
+        "description": "Log erro",
+        "type": "object",
+        "properties": {
+          "errorMessage": {
+            "type": "string",
+            "example": "/links/prev must match pattern ..."
+          },
+          "errorExample": {
+            "type": "string",
+            "example": "/links/prev: https://-N6AwOqXx8Jj8Zse9D.ug_FFpdfJNSKIrUHAsMpuYHXs.ifs"
+          },
+          "totalErrors": {
+            "type": "integer",
+            "example": 200
+          },
+          "totalRequests": {
+            "type": "integer",
+            "example": 34043
+          }
+        }
+      },
+      "report_item": {
+        "description": "Report structure",
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "example": "STARTED",
+            "default": "FINISHED",
+            "enum": [
+              "NOT_STARTED",
+              "STARTED",
+              "FINISHED",
+              "ERROR"
+            ]
+          },
+          "createdDateTime": {
+            "description": "DateTime when the report was created",
+            "type": "string",
+            "format": "date-time",
+            "example": "2021-02-01T19: 10: 22.549Z"
+          },
+          "groupedByField": {
+            "description": "Report aggregator field",
+            "type": "string",
+            "example": "payloadSourceId"
+          },
+          "groupedByValue": {
+            "description": "Report aggregator field value",
+            "type": "string",
+            "example": "11.222.333"
+          },
+          "period": {
+            "description": "Describes the period to which the report refers to",
+            "type": "string",
+            "example": "2021-02-01:2021-02-10"
+          }          
+        }
+      },
+      "report_list": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/report_item"
+        }
+      }
+    },
+    "securitySchemes": {
+      "APIKeyAuth": {
+        "name": "x-api-key",
+        "type": "apiKey",
+        "in": "header"
+      }
+    }
+  }
+}

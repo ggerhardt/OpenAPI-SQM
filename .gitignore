@@ -1,0 +1,12 @@
+# Node build artifacts
+node_modules
+npm-debug.log
+profiles
+temp
+# Local development
+#*.env
+*.dev
+
+# Docker
+#   Dockerfile
+#   docker-compose.yml
