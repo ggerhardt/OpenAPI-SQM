@@ -1,7 +1,7 @@
 {
   "name": "openapisqm",
-  "version": "0.0.2",
-  "description": "Asynchronously check payloads for adherence to schemas defined in an OpenAPI specification",
+  "version": "0.0.3",
+  "description": "Asynchronously check payloads for adherence to schemas defined in an OpenAPI specification.",
   "main": "app.js",
   "scripts": {
     "test": "jest",

@@ -23,7 +23,7 @@ cd openapisqm-compose
 docker compose up
 ``` 
 
-The `OpenAPI SQM` service will be running at [http://localhost:6868](http://localhost:6868), and the API documentation will be at [http://localhost:6868/docs/documentation.html](http://localhost:6868/docs/documentation.html).
+The `OpenAPI SQM` service will be running at [http://localhost:6868](http://localhost:6868), and the actionable API documentation will be at [http://localhost:6868/docs/documentation.html](http://localhost:6868/docs/documentation.html).
 
 ## Examples
 
@@ -55,8 +55,8 @@ All schemas referenced in OpenAPI specifications may be converted to newer versi
 ## Security 
 
 Some configurations have been made to minimize the storage of sensitive data:
-  - SAVE_PAYLOAD_CONTENT = FALSE - Sent payload is not persisted.
-  - AJV_ALL_ERRORS = FALSE - Only one error example per attribute and per error type will be saved.
+  - SAVE_PAYLOAD_CONTENT - If FALSE do not persist 'responsePayload'.
+  - AJV_ALL_ERRORS - If FALSE keeps only one error example per attribute and per error type.
 
 This service has not undergone a security hardening, so we suggest that you:
 

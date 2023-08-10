@@ -33,6 +33,5 @@ services:
       - DB_URL=mongodb://$MONGODB_USER:$MONGODB_PASSWORD@mongodb:$MONGODB_DOCKER_PORT/$MONGODB_DATABASE?authSource=admin&authMechanism=DEFAULT
     stdin_open: true
     tty: true
-
 volumes:
   db:
