@@ -38,7 +38,7 @@ const addReports = async (c, ctx) => {
       const aggTime = ctx.request.body.createDailyReports ? item.date : `${ctx.request.body.filters?.startDate ?? ''}:${ctx.request.body.filters?.endDate ?? '' }`;
       const aggFieldValue = item[createReportsBy];
 
-      repParmsList.push({aggfield: createReportsBy,
+      repParmsList.push({aggField: createReportsBy,
         aggFieldValue: aggFieldValue, period: aggTime});
       return repParmsList;
     } else {

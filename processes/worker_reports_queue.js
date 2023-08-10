@@ -57,8 +57,9 @@ async function processReports(job) {
     }
 
     const consolidatedList = payloadsArray.reduce((consolid, item) => {
-      const key = `${item.oasUrl} ${item.requestPath} ${item.requestOperation}`+
-          `${item.requestContentType} ${item.responseCode}`;
+      // eslint-disable-next-line max-len
+      const key = `${item.oasUrl} ${item.oasInfo.oasPath} ${item.oasInfo.oasOperation}`+
+          `${item.oasInfo.oasContentType} ${item.oasInfo.oasResponseCode}`;
       let foundObj = consolid.find((consolidItem) => {
         return consolidItem.key == key;
       });
@@ -66,10 +67,10 @@ async function processReports(job) {
         foundObj = {
           key: key,
           oasUrl: item.oasUrl,
-          requestPath: item.requestPath,
-          requestOperation: item.requestOperation,
-          responseContentType: item.requestContentType,
-          responseCode: item.responseCode,
+          requestPath: item.oasInfo.oasPath,
+          requestOperation: item.oasInfo.oasOperation,
+          responseContentType: item.oasInfo.oasContentType,
+          responseCode: item.oasInfo.oasResponseCode,
           finishedOk: (item.status == 'FINISHED') ? 1 : 0,
           finishedErrorSchema: (item.status == 'ERROR_SCHEMA') ? 1 : 0,
           finishedErrorOther: (item.status == 'ERROR') ? 1 : 0,
