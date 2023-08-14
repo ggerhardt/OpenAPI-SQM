@@ -232,7 +232,16 @@ function validatePayload(schemaId, payload) {
             aggErr[idx].allInstances.push({'instancePath': item.instancePath, 'instanceValue': item.data});
           }
         } else {
-          const simpleVal = (typeof (item.data) == 'string') ? item.data : '';
+          let simpleVal = '';
+          if (typeof (item.data) == 'string') {
+            simpleVal = `'${item.data}' (string)`;
+          } else if (typeof (item.data) == 'number') {
+            simpleVal = `${item.data} (number)`;
+          } else if (item.keyword == 'type') {
+            simpleVal = `(${typeof (item.data)})`;
+          } else {
+            logger.debug();
+          }
           const errLog = {'genInstancePath': item.genInstancePath, 'message': item.message, 'count': 1, 'keyword': item.keyword, 'instancePathExample': item.instancePath, 'instanceValueExample': simpleVal};
           if (process.env.AJV_ALL_ERRORS && process.env.AJV_ALL_ERRORS == 'TRUE') {
             errLog.allInstances = [{'instancePath': item.instancePath, 'instanceValue': item.data}];

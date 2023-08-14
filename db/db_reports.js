@@ -57,7 +57,7 @@ async function getReportsDB(aggregatorField, aggregatorFieldValue, period, statu
     // Connect to the MongoDB cluster
     mongoClient = await conn.connectToCluster();
     // Make the appropriate DB calls
-    const cursor = await mongoClient.db().collection('reports').find(objCondition).project({_id: 1, groupedByField: 1, groupedByFieldValue: 1, status: 1, period: 1}).skip(pageNumberInt > 0 ? ((pageNumberInt - 1) * recordsPerPageInt) : 0).limit(recordsPerPageInt);
+    const cursor = await mongoClient.db().collection('reports').find(objCondition).project({_id: 1, groupedByField: 1, groupedByValue: 1, status: 1, period: 1}).skip(pageNumberInt > 0 ? ((pageNumberInt - 1) * recordsPerPageInt) : 0).limit(recordsPerPageInt);
     result2 = await cursor.toArray();
   } catch (e) {
     err = e.message;

@@ -88,7 +88,7 @@ async function processReports(job) {
       }
       if (item.log) {
         foundObj.errors = item.log.reduce((listaCons, itemLog) => {
-          return addErrors(listaCons, itemLog);
+          return addErrors(listaCons, itemLog, item.payloadSourceId, item._id);
         }, foundObj.errors);
       }
       return consolid;
@@ -118,11 +118,14 @@ async function push(data) {
  * addErrors - process one error and update the aggregated list.
  * @param {object} consolidatedList - aggregated list of errors.
  * @param {object} item - error to be consolidated.
+ * @param {string} sourceId - source identification.
+ * @param {string} payloadId - payload with error.
  * @return {object} - updated consolidatedList
  */
-function addErrors(consolidatedList, item) {
+function addErrors(consolidatedList, item, sourceId, payloadId) {
   const errorMessage = `${item.genInstancePath} ${item.message}`;
-  const errorExample = `${item.instancePathExample}: ${item.dataExample}`;
+  // eslint-disable-next-line max-len
+  const errorExample = `${item.instancePathExample}: ${item.instanceValueExample}`;
   const errorCount = item.count;
   const foundObj = consolidatedList.find((consolidatedItem) => {
     return consolidatedItem.errorMessage == errorMessage;
@@ -130,6 +133,8 @@ function addErrors(consolidatedList, item) {
   if (foundObj) {
     foundObj.totalErrors += errorCount;
     foundObj.totalRequests += 1;
+    foundObj.payloadIds.push(payloadId);
+    foundObj.sourceIds.push(sourceId);
     // 10% is the chance of changing the selected error example
     if (Math.random() <= 0.1) {
       foundObj.errorExample = errorExample;
@@ -139,6 +144,8 @@ function addErrors(consolidatedList, item) {
       errorMessage: errorMessage,
       errorExample: errorExample,
       totalErrors: errorCount,
+      payloadIds: [payloadId],
+      sourceIds: [sourceId],
       totalRequests: 1,
     });
   }
