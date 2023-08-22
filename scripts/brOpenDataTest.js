@@ -1,6 +1,7 @@
 /* eslint-disable max-len */
 
 const axios = require('axios').default;
+const fs = require('fs');
 
 /**
  * SendSchemasToCheck - get opendata endpoints listed on UK Open Banking and test their schemas.
@@ -16,12 +17,12 @@ async function sendSchemasToCheck() {
     'opendata-investments': 'https://openbanking-brasil.github.io/openapi/swagger-apis/investments/1.0.0.yml',
     'opendata-exchange': 'https://openbanking-brasil.github.io/openapi/swagger-apis/exchange/1.0.0.yml',
     'opendata-acquiring-services': 'https://openbanking-brasil.github.io/openapi/swagger-apis/acquiring-services/1.0.0.yml',
-    'opendata-acquiring-services': 'https://openbanking-brasil.github.io/openapi/swagger-apis/acquiring-services/1.0.0.yml',
     'opendata-pension': 'https://openbanking-brasil.github.io/openapi/swagger-apis/pension/1.0.1.yml',
     'opendata-insurance': 'https://openbanking-brasil.github.io/openapi/swagger-apis/insurances/1.0.1.yml',
   };
   let count=0;
   let name = '';
+  const errorList = [];
   const openDataLists = await axios.request('https://data.directory.openbankingbrasil.org.br/participants');
   for (let x = 0; x < openDataLists.data.length; x++) {
     name = openDataLists.data[x].OrganisationName;
@@ -43,6 +44,7 @@ async function sendSchemasToCheck() {
                   try {
                     dataFromClient = await axios.request(url);
                   } catch (err) {
+                    errorList.push({organizationName: name, url: url, familyName: apiResourcesArray[z].ApiFamilyType, error: err.message, date: new Date().toISOString().split('T')[0]});
                     console.log(name + ' - ' + url);
                     console.log('Message: '+ err.message);
                   }
@@ -57,7 +59,7 @@ async function sendSchemasToCheck() {
                       'responseCode': dataFromClient.status.toString(),
                       'responsePayload': JSON.parse(JSON.stringify(dataFromClient.data)),
                       'tags': 'BrOpenData',
-                      'date': '2023-08-12',
+                      'date': new Date().toISOString().split('T')[0],
                     };
                     const options = {
                       method: 'POST',
@@ -85,6 +87,7 @@ async function sendSchemasToCheck() {
       }
     }
   }
+  fs.writeFileSync('./errorList.json', JSON.stringify(errorList));
 }
 
 

@@ -41,7 +41,7 @@ async function processReports(job) {
           `Error updating report '${job._id}' logs: ${updDb.error}`);
     }
     const vPeriod = job.period.split(':');
-
+    const showOrigin = job.showErrorSource??false;
 
     const getPaylDb = await payloadDb.getPayloadsDB('TRUE', (job.aggField == 'payloadSourceId') ? job.aggFieldValue : undefined, (job.aggField == 'oasUrl') ? job.aggFieldValue : undefined, vPeriod[0], (vPeriod.length>1)?vPeriod[1]:vPeriod[0], undefined, undefined, undefined, 1, 10000);
     if (getPaylDb.error) {
@@ -88,7 +88,7 @@ async function processReports(job) {
       }
       if (item.log) {
         foundObj.errors = item.log.reduce((listaCons, itemLog) => {
-          return addErrors(listaCons, itemLog, item.payloadSourceId, item._id);
+          return addErrors(listaCons, itemLog, (showOrigin)?item.payloadSourceId:'', (showOrigin)?item._id:'');
         }, foundObj.errors);
       }
       return consolid;
@@ -133,21 +133,24 @@ function addErrors(consolidatedList, item, sourceId, payloadId) {
   if (foundObj) {
     foundObj.totalErrors += errorCount;
     foundObj.totalRequests += 1;
-    foundObj.payloadIds.push(payloadId);
-    foundObj.sourceIds.push(sourceId);
+    if (sourceId) {
+      foundObj.payloads.push({id: payloadId, payloadSourceId: sourceId});
+    }
     // 10% is the chance of changing the selected error example
     if (Math.random() <= 0.1) {
       foundObj.errorExample = errorExample;
     }
   } else {
-    consolidatedList.push({
+    const errorObj = {
       errorMessage: errorMessage,
       errorExample: errorExample,
       totalErrors: errorCount,
-      payloadIds: [payloadId],
-      sourceIds: [sourceId],
       totalRequests: 1,
-    });
+    };
+    if (sourceId) {
+      errorObj.payloads= [{id: payloadId, payloadSourceId: sourceId}];
+    }
+    consolidatedList.push(errorObj);
   }
   return consolidatedList;
 }

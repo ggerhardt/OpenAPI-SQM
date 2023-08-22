@@ -229,22 +229,30 @@ function validatePayload(schemaId, payload) {
         if (idx > -1) {
           aggErr[idx].count++;
           if (process.env.AJV_ALL_ERRORS && process.env.AJV_ALL_ERRORS == 'TRUE') {
-            aggErr[idx].allInstances.push({'instancePath': item.instancePath, 'instanceValue': item.data});
+            aggErr[idx].allInstances.push({...item});
           }
         } else {
           let simpleVal = '';
-          if (typeof (item.data) == 'string') {
-            simpleVal = `'${item.data}' (string)`;
-          } else if (typeof (item.data) == 'number') {
-            simpleVal = `${item.data} (number)`;
-          } else if (item.keyword == 'type') {
-            simpleVal = `(${typeof (item.data)})`;
+          if (item.keyword == 'type') {
+            if (typeof (item.data) == 'string') {
+              simpleVal = `'${item.data}' (string)`;
+            } else if (typeof (item.data) == 'number') {
+              simpleVal = `${item.data} (number)`;
+            } else {
+              simpleVal = `(${typeof (item.data)})`;
+            }
+          } else if (item.keyword == 'additionalProperties') {
+            simpleVal = item.params.additionalProperty??'';
+          } else if (item.keyword == 'enum') {
+            simpleVal = item.data + ' not in ' + JSON.stringify(item.params.allowedValues);
+          } else if (item.keyword == 'required') {
+            simpleVal = item.params.missingProperty??'';
           } else {
-            logger.debug();
+            simpleVal = item.data;
           }
           const errLog = {'genInstancePath': item.genInstancePath, 'message': item.message, 'count': 1, 'keyword': item.keyword, 'instancePathExample': item.instancePath, 'instanceValueExample': simpleVal};
           if (process.env.AJV_ALL_ERRORS && process.env.AJV_ALL_ERRORS == 'TRUE') {
-            errLog.allInstances = [{'instancePath': item.instancePath, 'instanceValue': item.data}];
+            errLog.allInstances = [{...item}];
           }
           aggErr.push(errLog);
         }

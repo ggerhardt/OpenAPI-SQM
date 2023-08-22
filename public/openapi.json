@@ -52,8 +52,6 @@
             "in": "query",
             "description": "Filters records by processing status.",
             "required": false,
-            "style": "form",
-            "explode": true,
             "schema": {
               "type": "string",
               "example": "STARTED",
@@ -72,8 +70,6 @@
             "in": "query",
             "description": "Filters records by payload_source_id",
             "required": false,
-            "style": "form",
-            "explode": true,
             "schema": {
               "type": "string",
               "example": "11.222.333"
@@ -84,8 +80,6 @@
             "in": "query",
             "description": "Filters records by interaction_id.",
             "required": false,
-            "style": "form",
-            "explode": true,
             "schema": {
               "type": "string",
               "example": "09be02f2-0a3f-11ee-be56-0242ac120002"
@@ -96,8 +90,6 @@
             "in": "query",
             "description": "Filter records by tags, separated by a comma (','). Only records with all requested tags will be listed.",
             "required": false,
-            "style": "form",
-            "explode": true,
             "schema": {
               "type": "string",
               "example": "dados abertos"
@@ -109,8 +101,6 @@
             "in": "query",
             "description": "Filters records by date, according to RFC-3339 specification, UTC format. If not filled in, the default is to filter by the current date.",
             "required": false,
-            "style": "form",
-            "explode": true,
             "schema": {
               "type": "string",
               "format": "date",
@@ -123,8 +113,6 @@
             "in": "query",
             "description": "Defines whether detailed information on returned errors should be returned.",
             "required": true,
-            "style": "form",
-            "explode": true,
             "schema": {
               "type": "string",
               "example": "TRUE",
@@ -139,8 +127,6 @@
             "name": "page_number",
             "in": "query",
             "description": "Page number to be returned.",
-            "style": "form",
-            "explode": true,
             "schema": {
               "type": "integer",
               "example": 1,
@@ -153,8 +139,6 @@
             "name": "records_per_page",
             "in": "query",
             "description": "Number of records to return per request.",
-            "style": "form",
-            "explode": true,
             "schema": {
               "type": "integer",
               "example": 50,
@@ -355,8 +339,6 @@
             "in": "query",
             "description": "Filters reports that used this field as aggregator",
             "required": false,
-            "style": "form",
-            "explode": true,
             "schema": {
               "type": "string",
               "enum": [
@@ -371,8 +353,6 @@
             "in": "query",
             "description": "Filters reports aggregated by this value",
             "required": false,
-            "style": "form",
-            "explode": true,
             "schema": {
               "type": "string",
               "example": "11.222.333"
@@ -383,8 +363,6 @@
             "in": "query",
             "description": "Filters records by period, according to RFC-3339 specification, UTC format. If not filled in, the default is to filter by the current date.",
             "required": false,
-            "style": "form",
-            "explode": true,
             "schema": {
               "type": "string",
               "format": "date",
@@ -397,8 +375,6 @@
             "in": "query",
             "description": "Filters records by processing status.",
             "required": false,
-            "style": "form",
-            "explode": true,
             "schema": {
               "type": "string",
               "example": "STARTED",
@@ -415,8 +391,6 @@
             "name": "page_number",
             "in": "query",
             "description": "Page number to be returned.",
-            "style": "form",
-            "explode": true,
             "schema": {
               "type": "integer",
               "example": 1,
@@ -429,8 +403,6 @@
             "name": "records_per_page",
             "in": "query",
             "description": "Number of records to return per request.",
-            "style": "form",
-            "explode": true,
             "schema": {
               "type": "integer",
               "example": 50,
@@ -497,6 +469,12 @@
                     "type": "boolean",
                     "example": true
                   },                  
+                  "showErrorSource": {
+                    "description": "When true, shows payload Id and company name for each aggregated error.",
+                    "type": "boolean",
+                    "default": false,
+                    "example": false
+                  },
                   "filters": {
                     "type": "object",
                     "properties": {

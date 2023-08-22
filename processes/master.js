@@ -9,8 +9,6 @@ const routePayloads = require('./master_payloads_route.js');
 const routeReports = require('./master_reports_route.js');
 require('dotenv').config();
 const fs = require('fs');
-const Ajv = require('ajv');
-const addFormats = require('ajv-formats');
 const {exit} = require('process');
 
 (async () => {
@@ -33,12 +31,6 @@ const {exit} = require('process');
     definition: obj,
     apiRoot: '/api',
     strict: false,
-    quick: false,
-    customizeAjv: () => {
-      const ajv = new Ajv({strict: false});
-      addFormats(ajv);
-      return ajv;
-    },
     handlers: {
       addPayload: routePayloads.addPayload,
       getPayloads: routePayloads.getPayloads,
