@@ -9,10 +9,12 @@ const fs = require('fs');
 async function sendSchemasToCheck() {
   const port = (process.argv[2] || '8080');
   const listaFamilyTypeOpenAPI = {
-    'discovery': 'https://openbanking-brasil.github.io/openapi/swagger-apis/common/2.0.0-beta.1.yml',
-    'channels': 'https://openbanking-brasil.github.io/openapi/swagger-apis/channels/1.0.2.yml',
+    'discovery': 'https://openbanking-brasil.github.io/openapi/swagger-apis/common/1.0.2.yml',
+    // 'discovery': 'https://openbanking-brasil.github.io/openapi/swagger-apis/common/2.0.0-beta.1.yml',
+    // 'admin': 'https://openbanking-brasil.github.io/openapi/swagger-apis/admin/2.0.0-beta.1.yml',
+    'admin': 'https://openbanking-brasil.github.io/openapi/swagger-apis/admin/1.0.2.yml',
     'products-services': 'https://openbanking-brasil.github.io/openapi/swagger-apis/products-services/1.0.2.yml',
-    'admin': 'https://openbanking-brasil.github.io/openapi/swagger-apis/admin/2.0.0-beta.1.yml',
+    'channels': 'https://openbanking-brasil.github.io/openapi/swagger-apis/channels/1.0.2.yml',
     'opendata-capitalization': 'https://openbanking-brasil.github.io/openapi/swagger-apis/capitalization-bonds/1.0.1.yml',
     'opendata-investments': 'https://openbanking-brasil.github.io/openapi/swagger-apis/investments/1.0.0.yml',
     'opendata-exchange': 'https://openbanking-brasil.github.io/openapi/swagger-apis/exchange/1.0.0.yml',
@@ -33,13 +35,19 @@ async function sendSchemasToCheck() {
           const apiResourcesArray = authServers[y].ApiResources;
           for (let z = 0; z < apiResourcesArray.length; z++) {
             const apiFamily = apiResourcesArray[z].ApiFamilyType.split('_')[0];
-            // const apiVersion = apiResourcesArray[z].ApiVersion;
+            const apiVersion = apiResourcesArray[z].ApiVersion.split('.')[0];
             if (apiResourcesArray[z].ApiDiscoveryEndpoints) {
               const apiEndpointsArray = apiResourcesArray[z].ApiDiscoveryEndpoints;
               for (let w = 0; w < apiEndpointsArray.length; w++) {
                 const url = apiEndpointsArray[w].ApiEndpoint;
                 const openapiUrl = listaFamilyTypeOpenAPI[apiFamily];
                 if (openapiUrl) {
+                  // verify version of the api (terrible test)
+                  if (openapiUrl.indexOf('/' + apiVersion + '.0.')==-1) {
+                    console.log( 'Version '+ apiVersion);
+                    console.log( 'openapiUrl: '+ openapiUrl);
+                    continue;
+                  }
                   let dataFromClient;
                   try {
                     dataFromClient = await axios.request(url);

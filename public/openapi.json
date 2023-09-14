@@ -221,9 +221,9 @@
         "operationId": "deletePayloads",
         "parameters": [
           {
-            "name": "tag",
+            "name": "tags",
             "in": "query",
-            "description": "Tag identifying the payloads to be deleted.",
+            "description": "Tags identifying the payloads to be deleted.",
             "required": true,
             "schema": {
               "maxLength": 256,

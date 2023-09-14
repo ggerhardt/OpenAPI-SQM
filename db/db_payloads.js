@@ -159,9 +159,29 @@ async function deletePayloadDB(payloadId) {
     return {error: err, result: result2};
   }
 }
-
+/**
+ * Delete payload.
+ * @param {string} tags - tag text
+ * @return {object} a return object: {error: err or null, result: object}
+ */
+async function deletePayloadsDB(tags) {
+  let result;
+  let err = '';
+  try {
+    mongoClient = await conn.connectToCluster();
+    result = await mongoClient.db().collection('payloads').deleteMany({'tags': {$all: `${tags}`.split(',')}});
+    if (!result) {
+      throw new Error(`Error deleting obj with these tags: '${tags}'`);
+    }
+  } catch (e) {
+    err = e.message;
+  } finally {
+    return {error: err, result: result};
+  }
+}
 module.exports.addPayloadDB = addPayloadDB;
 module.exports.getPayloadDB = getPayloadDB;
 module.exports.getPayloadsDB = getPayloadsDB;
 module.exports.updatePayloadDB = updatePayloadDB;
 module.exports.deletePayloadDB = deletePayloadDB;
+module.exports.deletePayloadsDB = deletePayloadsDB;

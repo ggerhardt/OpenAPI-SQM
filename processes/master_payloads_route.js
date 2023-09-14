@@ -60,7 +60,7 @@ const deletePayload = async (c, ctx) => {
 };
 
 const deletePayloads = async (c, ctx) => {
-  const retdb = await payloadsDb.deletePayloadDB(c.request.query['tag']);
+  const retdb = await payloadsDb.deletePayloadsDB(c.request.query['tags']);
   if (retdb.error != '') {
     ctx.body = {err: [{message: retdb.error}]};
     ctx.status = 400;

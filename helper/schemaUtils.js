@@ -238,6 +238,8 @@ function validatePayload(schemaId, payload) {
               simpleVal = `'${item.data}' (string)`;
             } else if (typeof (item.data) == 'number') {
               simpleVal = `${item.data} (number)`;
+            } else if (item.data == null) {
+              simpleVal = `(null)`;
             } else {
               simpleVal = `(${typeof (item.data)})`;
             }
