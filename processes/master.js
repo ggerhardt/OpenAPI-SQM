@@ -42,6 +42,7 @@ const {exit} = require('process');
       addReports: routeReports.addReports,
       getReport: routeReports.getReport,
       deleteReport: routeReports.deleteReport,
+      deleteReports: routeReports.deleteReports,
 
       unauthorizedHandler: routePayloads.unauthorizedHandler,
       validationFail: routePayloads.validationFail,

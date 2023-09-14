@@ -99,7 +99,17 @@ const deleteReport = async (c, ctx) => {
   }
 };
 
+const deleteReports = async (c, ctx) => {
+  const retdb = await reportsDb.deleteReportsDB(c.request.query['until_date']);
+  if (retdb.error != '') {
+    ctx.body = {err: [{message: retdb.error}]};
+    ctx.status = 400;
+  } else {
+    ctx.status = 204;
+  }
+};
 module.exports.addReports = addReports;
 module.exports.getReports = getReports;
 module.exports.getReport = getReport;
 module.exports.deleteReport = deleteReport;
+module.exports.deleteReports = deleteReports;

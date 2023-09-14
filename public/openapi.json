@@ -534,6 +534,43 @@
         },
         "operationId": "addReports",
         "description": "Create new reports"
+      },
+      "delete": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Delete reports",
+        "description": "Delete reports from the database",
+        "operationId": "deleteReports",
+        "parameters": [
+          {
+            "name": "until_date",
+            "in": "query",
+            "description": "Delete all reports until this date (included)",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "[0-9]{4}-[0-9]{2}-[0-9]{2}",
+              "example": "2021-02-01"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error_400"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/reports/{report_id}": {

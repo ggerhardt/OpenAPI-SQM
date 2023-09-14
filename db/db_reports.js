@@ -141,8 +141,30 @@ async function deleteReportDB(reportId) {
   }
 }
 
+/**
+ * Delete reports.
+ * @param {string} untilDate - until_date
+ * @return {object} a return object: {error: err or null, result: object}
+ */
+async function deleteReportsDB(untilDate) {
+  let result;
+  let err = '';
+  try {
+    mongoClient = await conn.connectToCluster();
+    result = await mongoClient.db().collection('reports').deleteMany({'period': {$lte: `${untilDate}`}});
+    if (!result) {
+      throw new Error(`Error deleting reports from date '${untilDate}'`);
+    }
+  } catch (e) {
+    err = e.message;
+  } finally {
+    return {error: err, result: result};
+  }
+}
+
 module.exports.addReportsDB = addReportsDB;
 module.exports.getReportDB = getReportDB;
 module.exports.getReportsDB = getReportsDB;
 module.exports.updateReportDB = updateReportDB;
 module.exports.deleteReportDB = deleteReportDB;
+module.exports.deleteReportsDB = deleteReportsDB;
