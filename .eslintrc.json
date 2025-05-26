@@ -8,6 +8,7 @@
     "parserOptions": {
         "ecmaVersion": "latest"
     },
+    "ignorePatterns": ["**/*.test.js", "**/*.spec.js"],
     "rules": {
         "max-len": [
             "error",

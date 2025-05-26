@@ -164,12 +164,19 @@ async function deletePayloadDB(payloadId) {
  * @param {string} tags - tag text
  * @return {object} a return object: {error: err or null, result: object}
  */
-async function deletePayloadsDB(tags) {
+async function deletePayloadsDB(tags, date_filter) {
   let result;
   let err = '';
   try {
     mongoClient = await conn.connectToCluster();
-    result = await mongoClient.db().collection('payloads').deleteMany({'tags': {$all: `${tags}`.split(',')}});
+    const conditions = [{'tags': {$all: `${tags}`.split(',')}}];
+    if (date_filter) {
+      conditions.push({'date': date_filter});
+    }
+  
+    const objCondition = conditions.length == 1 ? conditions[0] : {'$and': conditions};
+       
+    result = await mongoClient.db().collection('payloads').deleteMany(objCondition);
     if (!result) {
       throw new Error(`Error deleting obj with these tags: '${tags}'`);
     }
