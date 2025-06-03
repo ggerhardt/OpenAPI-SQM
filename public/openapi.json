@@ -44,7 +44,7 @@
           "Payloads checks"
         ],
         "summary": "List payloads",
-        "description": "Lists all payloads sent for checking and their status\n <table><thead><tr><td>Etiqueta</td><td>Descrição</td></tr></thead><tbody>  <tr><td>a</td><td>Explicação das diferenças significativas entre os valores reportados nas colunas (a) e (b) da tabela LI1.</td></tr>   <tr><td>b</td><td>Explicação das diferenças relevantes entre os valores informados nas demonstrações contábeis e os valores considerados para fins do tratamento prudencial.</td></tr>   <tr><td>c</td><td>Descrição dos sistemas e controles utilizados para assegurar a confiabilidade do apreçamento conforme disposto na Resolução nº 4.277, de 2013, quando este resultar em valor diferente do registrado contabilmente (linha 5 da tabela LI2), abrangendo:<br><ul> </li><li> descrição das metodologias de apreçamento, incluindo o grau de utilização de avaliação a mercado e de avaliação por modelo; </li><li> descrição dos procedimentos de verificação independente; </li><li>procedimentos para a avaliação da necessidade de ajustes prudenciais decorrentes do apreçamento de instrumentos financeiros.</li></ul></td></tr>  </tbody></table> ",
+        "description": "Lists all payloads sent for checking and their status",
         "operationId": "getPayloads",
         "parameters": [
           {
