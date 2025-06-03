@@ -77,7 +77,6 @@ This service has not undergone a security hardening, so we suggest that you:
  - Performance - specialize workers by apis/schemas (less memory). 
  - Create parameter to limit when a compiled schema (ajv) can be freed after a while.
  - Enable the check of header schemas.
- - syncronous option (?)
  - Test additional business rules of a payload.
   
 ## Architecture
