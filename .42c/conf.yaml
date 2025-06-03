@@ -1,3 +1,0 @@
-apis:
-  public/openapi.json:
-    alias: openapi-sqm-schema-quality-monit
