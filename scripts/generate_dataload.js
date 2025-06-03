@@ -84,22 +84,27 @@ async function createApiPayloadExamples(urlOas, examplesToBeGenerated = 20) {
   const origin = (process.argv[3] || 'UK'); // UK or BR or AUS
 
   const apis = {
-    'BR': ['https://openbanking-brasil.github.io/openapi/swagger-apis/consents/2.0.1.yml',
-      'https://openbanking-brasil.github.io/openapi/swagger-apis/resources/2.0.1.yml',
-      'https://openbanking-brasil.github.io/openapi/swagger-apis/customers/2.0.1.yml',
-      'https://openbanking-brasil.github.io/openapi/swagger-apis/credit-cards/2.0.1.yml',
-      'https://openbanking-brasil.github.io/openapi/swagger-apis/accounts/2.0.1.yml',
-      'https://openbanking-brasil.github.io/openapi/swagger-apis/loans/2.0.1.yml',
-      'https://openbanking-brasil.github.io/openapi/swagger-apis/financings/2.0.1.yml',
-      'https://openbanking-brasil.github.io/openapi/swagger-apis/unarranged-accounts-overdraft/2.0.1.yml',
-      'https://openbanking-brasil.github.io/openapi/swagger-apis/invoice-financings/2.0.1.yml'],
-    'AUS': ['https://consumerdatastandardsaustralia.github.io/standards/includes/swagger/cds_banking.json'],
-    'UK': ['https://raw.githubusercontent.com/OpenBankingUK/read-write-api-specs/master/dist/openapi/account-info-openapi.yaml',
-      'https://raw.githubusercontent.com/OpenBankingUK/read-write-api-specs/master/dist/openapi/payment-initiation-openapi.yaml',
-      'https://raw.githubusercontent.com/OpenBankingUK/read-write-api-specs/master/dist/openapi/confirmation-funds-openapi.yaml',
-      'https://raw.githubusercontent.com/OpenBankingUK/read-write-api-specs/master/dist/openapi/vrp-openapi.yaml',
+    'BR': ['https://raw.githubusercontent.com/OpenBanking-Brasil/openapi/main/swagger-apis/payments/4.0.0-beta.3.yml',
+      'https://raw.githubusercontent.com/OpenBanking-Brasil/openapi/main/swagger-apis/automatic-payments/1.0.0-beta.4.yml'
     ],
   };
+  // const apis2 = {
+  //   'BR': ['https://openbanking-brasil.github.io/openapi/swagger-apis/consents/2.0.1.yml',
+  //     'https://openbanking-brasil.github.io/openapi/swagger-apis/resources/2.0.1.yml',
+  //     'https://openbanking-brasil.github.io/openapi/swagger-apis/customers/2.0.1.yml',
+  //     'https://openbanking-brasil.github.io/openapi/swagger-apis/credit-cards/2.0.1.yml',
+  //     'https://openbanking-brasil.github.io/openapi/swagger-apis/accounts/2.0.1.yml',
+  //     'https://openbanking-brasil.github.io/openapi/swagger-apis/loans/2.0.1.yml',
+  //     'https://openbanking-brasil.github.io/openapi/swagger-apis/financings/2.0.1.yml',
+  //     'https://openbanking-brasil.github.io/openapi/swagger-apis/unarranged-accounts-overdraft/2.0.1.yml',
+  //     'https://openbanking-brasil.github.io/openapi/swagger-apis/invoice-financings/2.0.1.yml'],
+  //   'AUS': ['https://consumerdatastandardsaustralia.github.io/standards/includes/swagger/cds_banking.json'],
+  //   'UK': ['https://raw.githubusercontent.com/OpenBankingUK/read-write-api-specs/master/dist/openapi/account-info-openapi.yaml',
+  //     'https://raw.githubusercontent.com/OpenBankingUK/read-write-api-specs/master/dist/openapi/payment-initiation-openapi.yaml',
+  //     'https://raw.githubusercontent.com/OpenBankingUK/read-write-api-specs/master/dist/openapi/confirmation-funds-openapi.yaml',
+  //     'https://raw.githubusercontent.com/OpenBankingUK/read-write-api-specs/master/dist/openapi/vrp-openapi.yaml',
+  //   ],
+  // };
 
   await deleteSchemaDB();
   for (i = 0; i < apis[origin].length; i++) {
