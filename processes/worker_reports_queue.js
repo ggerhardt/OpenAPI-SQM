@@ -32,6 +32,7 @@ function startListening() {
  * @param {object} job - data to be analysed.
  */
 async function processReports(job) {
+  let dbg_id = "";
   try {
     const updDb = await reportDb.updateReportDB(job._id, {status: 'STARTED'});
     if (updDb.error) {
@@ -43,7 +44,7 @@ async function processReports(job) {
     const vPeriod = job.period.split(':');
     const showOrigin = job.showErrorSource??false;
 
-    const getPaylDb = await payloadDb.getPayloadsDB('TRUE', (job.aggField == 'payloadSourceId') ? job.aggFieldValue : undefined, (job.aggField == 'oasUrl') ? job.aggFieldValue : undefined, vPeriod[0], (vPeriod.length>1)?vPeriod[1]:vPeriod[0], undefined, undefined, undefined, 1, 10000);
+    const getPaylDb = await payloadDb.getPayloadsDB('TRUE', (job.aggField == 'payloadSourceId') ? job.aggFieldValue : (job.filters?.payloadSourceId) ? job.filters?.payloadSourceId:null, (job.aggField == 'oasUrl') ? job.aggFieldValue : undefined, vPeriod[0], (vPeriod.length>1)?vPeriod[1]:vPeriod[0], undefined, undefined, undefined, 1, 10000);
     if (getPaylDb.error) {
       logger.error(
           `Error reading payload '${job._id}' logs: ${getPaylDb.error}`);
@@ -55,14 +56,36 @@ async function processReports(job) {
       logger.error(`No payloads selected '${job._id}'`);
       throw new Error(`Error reading payload '${job._id}'`);
     }
-
+    const notFoundList =[];
+    
     const consolidatedList = payloadsArray.reduce((consolid, item) => {
-      // eslint-disable-next-line max-len
+      dbg_id = item._id;
+      if (!item.oasInfo) {
+        const errors = [];
+        if (item.log) {
+          errors = item.log.reduce((listaCons, itemLog) => {
+            return addErrors(listaCons, itemLog, (showOrigin)?item.payloadSourceId:'', (showOrigin)?item._id:'');
+          }, errors);
+        }        
+        notFoundList.push({
+          oasUrl: item.oasUrl,
+          requestUrl: item.requestUrl,
+          status:item.status,
+          statusDetail:item.statusDetail,
+          errors: errors,
+        });
+        return consolid;
+      }
       const key = `${item.oasUrl} ${item.oasInfo.oasPath} ${item.oasInfo.oasOperation}`+
           `${item.oasInfo.oasContentType} ${item.oasInfo.oasResponseCode}`;
-      let foundObj = consolid.find((consolidItem) => {
-        return consolidItem.key == key;
-      });
+      //let foundObj = consolid.find((consolidItem) => {
+      //  return consolidItem.key == key;
+      //});
+      let foundObj = undefined;
+      for (let i =0; i < consolid.length; i++) {
+        if (consolid[i].key == key)
+            foundObj = consolid[i]
+      }
       if (!foundObj) {
         foundObj = {
           key: key,
@@ -88,12 +111,19 @@ async function processReports(job) {
       }
       if (item.log) {
         foundObj.errors = item.log.reduce((listaCons, itemLog) => {
-          return addErrors(listaCons, itemLog, (showOrigin)?item.payloadSourceId:'', (showOrigin)?item._id:'');
+          let errList=[]
+          try {
+            errList = addErrors(listaCons, itemLog, (showOrigin)?item.payloadSourceId:'', (showOrigin)?item._id:'');
+          } finally {
+            return errList
+          }           
         }, foundObj.errors);
       }
       return consolid;
     }, []);
     const repUpdate = {status: 'FINISHED', consolidatedList: consolidatedList};
+    if (notFoundList.length > 0)
+      repUpdate.notFound = [...notFoundList];
     const resp3 = await reportDb.updateReportDB(job._id, repUpdate);
     if (resp3.error) {
       logger.error(`Error updating payload '${job._id}' logs: ${resp3.error}`);

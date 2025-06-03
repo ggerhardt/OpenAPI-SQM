@@ -3,9 +3,13 @@ const queue = require('./worker_payloads_queue.js');
 
 const addPayload = async (c, ctx) => {
   let responsePayload;
+  const sync = c.request.query['sync']=='true';
   try {
     // eslint-disable-next-line max-len
     responsePayload = JSON.parse(JSON.stringify(ctx.request.body.responsePayload));
+    if (typeof(responsePayload) == 'string') {
+      throw new Error('Payload should be a object or an array');
+    }
   } catch (err) {
     ctx.body = {err: [{message: '[response_payload] ' + err.message}]};
     ctx.status = 400;
@@ -22,8 +26,35 @@ const addPayload = async (c, ctx) => {
   } else {
     ctx.request.body.responsePayload = responsePayload;
     queue.push({'_id': retdb.result.insertedId, ...ctx.request.body});
-    ctx.body = retdb.result;
-    ctx.status = 200;
+    if (!sync) {
+      ctx.body = retdb.result;
+      ctx.status = 200;
+      return;
+    } else {
+      
+      let availableIterations = 30; //
+      while (availableIterations > 0) {
+        await waitOneSecond();
+        const retdbloop = await payloadsDb.getPayloadDB(retdb.result.insertedId);
+        if (retdbloop.error != '') {
+          ctx.body = {err: [{message: retdbloop.error}]};
+          ctx.status = 400;
+          return;
+        } else {
+          if (retdbloop.result.status != "NOT_STARTED" && retdbloop.result.status != "STARTED"){
+            ctx.body = retdbloop.result;
+            ctx.status = 200;
+            return
+          }
+        }
+      }
+      //could't complete in 30 cycles
+      retdb.result.sync = false;
+      //ctx.request.body.responsePayload = responsePayload;
+      ctx.body = retdb.result;
+      ctx.status = 200;
+      return;
+    }
   }
 };
 
@@ -60,7 +91,7 @@ const deletePayload = async (c, ctx) => {
 };
 
 const deletePayloads = async (c, ctx) => {
-  const retdb = await payloadsDb.deletePayloadsDB(c.request.query['tags']);
+  const retdb = await payloadsDb.deletePayloadsDB(c.request.query['tags'], c.request.query['date']);
   if (retdb.error != '') {
     ctx.body = {err: [{message: retdb.error}]};
     ctx.status = 400;
@@ -68,6 +99,14 @@ const deletePayloads = async (c, ctx) => {
     ctx.status = 204;
   }
 };
+
+async function waitOneSecond() {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve();
+    }, 1000); // 1000 milissegundos = 1 second
+  });
+}
 
 const unauthorizedHandler = async (c, ctx) => {
   ctx.body = {err: [{message: 'unauthorized'}]};
